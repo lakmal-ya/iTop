@@ -1,0 +1,29 @@
+#apache-php
+FROM ubuntu
+
+MAINTAINER Docker version 1.0
+
+ENV DEBIAN_FRONTEND noninteractive
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+ENV APACHE_PID_FILE /var/run/apache2.pid
+
+RUN apt-get update && apt-get install -y apache2 mysql-server
+RUN apt-get install php7.2 php7.2-mysql libapache2-mod-php7.2 php7.2-ldap php7.2-soap php7.2-json php7.2-xml php7.2-gd php7.2-zip graphviz -y
+RUN apt-get install unzip wget -y
+RUN mkdir /home/itop
+RUN cd /home/itop && wget https://sourceforge.net/projects/itop/files/latest/download && unzip download
+RUN rm -rf download
+RUN mkdir /var/www/html/itop
+RUN cp -R /home/itop/* /var/www/html/itop
+RUN cd /var/www/html && mkdir conf data env-production env-production-build log
+RUN chown www-data.www-data /var/www/html/itop/* -R
+RUN service mysql start
+RUN mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --innodb-flush-log-at-trx-commit=0
+
+EXPOSE 80 3306
+
+CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]

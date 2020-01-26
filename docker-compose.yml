@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+     web:
+       build: public_html/
+       container_name: itop
+       environment:
+          - MYSQL_ROOT_PASSWORD=123
+          - MYSQL_USER=itop_user
+          - MYSQL_PASSWORD=123
+          - MYSQL_DATABASE=itopdb
+       ports:
+          - 80:80
+       networks:
+          - mynet
+       volumes:
+          - public_html:/var/www/html
+          - mysqldata:/var/lib/mysql
+       
+networks:
+     mynet:
+       driver: bridge
+
+volumes:
+     public_html:
+     mysqldata:
